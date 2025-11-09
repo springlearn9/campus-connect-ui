@@ -3,9 +3,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import theme from './theme/theme';
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
-import Students from './pages/Students';
-import Courses from './pages/Courses';
 import Events from './pages/Events';
+import Notices from './pages/Notices';
+import LostFound from './pages/LostFound';
+import Users from './pages/Users';
 
 function App() {
   return (
@@ -14,9 +15,10 @@ function App() {
         <Routes>
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="students" element={<Students />} />
-            <Route path="courses" element={<Courses />} />
             <Route path="events" element={<Events />} />
+            <Route path="notices" element={<Notices />} />
+            <Route path="lost-found" element={<LostFound />} />
+            <Route path="users" element={<Users />} />
             <Route path="analytics" element={<Dashboard />} />
             <Route path="settings" element={<Dashboard />} />
           </Route>

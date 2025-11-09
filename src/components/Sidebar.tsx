@@ -8,9 +8,10 @@ import {
 import { NavLink } from 'react-router-dom';
 import {
   FiHome,
-  FiUsers,
-  FiBook,
   FiCalendar,
+  FiBell,
+  FiPackage,
+  FiUsers,
   FiSettings,
   FiBarChart2,
 } from 'react-icons/fi';
@@ -71,9 +72,10 @@ const Sidebar = () => {
 
         <VStack gap={1} align="stretch" px={3} flex={1}>
           <NavItem icon={FiHome} label="Dashboard" to="/" />
-          <NavItem icon={FiUsers} label="Students" to="/students" />
-          <NavItem icon={FiBook} label="Courses" to="/courses" />
           <NavItem icon={FiCalendar} label="Events" to="/events" />
+          <NavItem icon={FiBell} label="Notices" to="/notices" />
+          <NavItem icon={FiPackage} label="Lost & Found" to="/lost-found" />
+          <NavItem icon={FiUsers} label="Users" to="/users" />
           <NavItem icon={FiBarChart2} label="Analytics" to="/analytics" />
           <NavItem icon={FiSettings} label="Settings" to="/settings" />
         </VStack>
