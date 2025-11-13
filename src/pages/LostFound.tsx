@@ -10,6 +10,8 @@ import {
   Text,
   Flex,
   Tabs,
+  Stack,
+  Image,
 } from '@chakra-ui/react';
 import { Table } from '@chakra-ui/react';
 import { FiSearch, FiPlus, FiPackage } from 'react-icons/fi';
@@ -21,6 +23,10 @@ const LostFound = () => {
   const [foundItems, setFoundItems] = useState<FoundItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showReportForm, setShowReportForm] = useState(false);
+  const [reportingFor, setReportingFor] = useState<'lost' | 'found'>('lost');
+  const [form, setForm] = useState<any>({ itemName: '', description: '', location: '', status: 'PENDING', reporterEmail: '' });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     fetchItems();
@@ -64,6 +70,28 @@ const LostFound = () => {
     item.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const resetForm = () => {
+    setForm({ itemName: '', description: '', location: '', status: 'PENDING', reporterEmail: '' });
+    setImagePreview(null);
+  };
+
+  const submitReport = async () => {
+    try {
+      if (reportingFor === 'lost') {
+        const payload = { ...form };
+        await lostFoundService.addLostItem(payload);
+      } else {
+        const payload: any = { ...form, photoUrl: imagePreview, foundDate: new Date().toISOString() };
+        await lostFoundService.addFoundItem(payload);
+      }
+      // refresh
+      await fetchItems();
+      resetForm();
+      setShowReportForm(false);
+    } catch (err) {
+      console.error('Error reporting item', err);
+    }
+  };
   return (
     <Box>
       <Heading mb={6} size="lg">
@@ -133,11 +161,61 @@ const LostFound = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </Group>
-          <Button colorPalette="brand">
+          <Button colorPalette="brand" onClick={() => setShowReportForm(!showReportForm)}>
             <FiPlus />
             Report Item
           </Button>
         </HStack>
+
+        {showReportForm && (
+          <Box mb={4} bg="gray.50" p={4} borderRadius="md">
+            <Stack gap={3} direction={{ base: 'column', md: 'row' }}>
+              <select 
+                value={reportingFor} 
+                onChange={(e: any) => setReportingFor(e.target.value as any)} 
+                style={{
+                  maxWidth: '160px',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  border: '1px solid #E2E8F0',
+                  backgroundColor: 'white'
+                }}>
+                <option value="lost">Report Lost</option>
+                <option value="found">Report Found</option>
+              </select>
+              <Input placeholder="Item name" value={form.itemName} onChange={(e) => setForm((s:any)=>({...s,itemName:e.target.value}))} />
+              <Input placeholder="Location" value={form.location} onChange={(e) => setForm((s:any)=>({...s,location:e.target.value}))} />
+              <select 
+                value={form.status} 
+                onChange={(e: any) => setForm((s:any)=>({...s,status:e.target.value}))} 
+                style={{
+                  maxWidth: '160px',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  border: '1px solid #E2E8F0',
+                  backgroundColor: 'white'
+                }}>
+                <option value="PENDING">Pending</option>
+                <option value="FOUND">Found</option>
+                <option value="CLAIMED">Claimed</option>
+              </select>
+              <Input placeholder="Reporter email (for contact)" value={form.reporterEmail} onChange={(e) => setForm((s:any)=>({...s,reporterEmail:e.target.value}))} />
+            </Stack>
+            <Stack direction={{ base: 'column', md: 'row' }} gap={3} mt={3} align="center">
+              {reportingFor === 'found' && (
+                <>
+                  <Input type="file" accept="image/*" onChange={(e:any)=>{
+                    const file = e.target.files?.[0];
+                    if (file) setImagePreview(URL.createObjectURL(file));
+                  }} />
+                  {imagePreview && <Image src={imagePreview} maxH="120px" borderRadius="md" />}
+                </>
+              )}
+              <Button colorPalette="brand" onClick={submitReport}>Submit</Button>
+              <Button variant="ghost" onClick={() => { resetForm(); setShowReportForm(false); }}>Cancel</Button>
+            </Stack>
+          </Box>
+        )}
 
         {loading ? (
           <Text>Loading items...</Text>
@@ -190,6 +268,7 @@ const LostFound = () => {
                       <Table.ColumnHeader>Description</Table.ColumnHeader>
                       <Table.ColumnHeader>Location</Table.ColumnHeader>
                       <Table.ColumnHeader>Found Date</Table.ColumnHeader>
+                      <Table.ColumnHeader>Contact</Table.ColumnHeader>
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
@@ -200,6 +279,18 @@ const LostFound = () => {
                         <Table.Cell>{item.location}</Table.Cell>
                         <Table.Cell>
                           {item.foundDate ? new Date(item.foundDate).toLocaleDateString() : 'N/A'}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Button size="sm" onClick={() => {
+                            const email = (item as any).reportedBy?.email || (item as any).reporterEmail || '';
+                            if (email) {
+                              window.location.href = `mailto:${email}?subject=Regarding%20your%20found%20item%20${encodeURIComponent(item.itemName)}`;
+                            } else {
+                              // fallback: copy info or prompt
+                              const fallback = prompt('No contact email available. Enter an email to open mail client:');
+                              if (fallback) window.location.href = `mailto:${fallback}?subject=Regarding%20your%20found%20item%20${encodeURIComponent(item.itemName)}`;
+                            }
+                          }}>Contact Finder</Button>
                         </Table.Cell>
                       </Table.Row>
                     ))}

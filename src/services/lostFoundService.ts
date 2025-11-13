@@ -1,4 +1,5 @@
 import api from './api';
+import { mockService } from './mockService';
 
 export interface LostItem {
   id?: number;
@@ -23,12 +24,44 @@ export interface FoundItem {
 
 export const lostFoundService = {
   // Lost Items
-  getAllLostItems: () => api.get<LostItem[]>('/lost'),
+  getAllLostItems: async () => {
+    try {
+      return await api.get<LostItem[]>('/lost');
+    } catch (error) {
+      // Fallback to mock data
+      mockService.init();
+      return { data: mockService.getLostItems() };
+    }
+  },
   
-  addLostItem: (item: LostItem) => api.post<LostItem>('/lost', item),
+  addLostItem: async (item: LostItem) => {
+    try {
+      return await api.post<LostItem>('/lost', item);
+    } catch (error) {
+      // Fallback to mock data
+      const newItem = mockService.addLostItem(item);
+      return { data: newItem };
+    }
+  },
   
   // Found Items
-  getAllFoundItems: () => api.get<FoundItem[]>('/found'),
+  getAllFoundItems: async () => {
+    try {
+      return await api.get<FoundItem[]>('/found');
+    } catch (error) {
+      // Fallback to mock data
+      mockService.init();
+      return { data: mockService.getFoundItems() };
+    }
+  },
   
-  addFoundItem: (item: FoundItem) => api.post<FoundItem>('/found', item),
+  addFoundItem: async (item: FoundItem) => {
+    try {
+      return await api.post<FoundItem>('/found', item);
+    } catch (error) {
+      // Fallback to mock data
+      const newItem = mockService.addFoundItem(item);
+      return { data: newItem };
+    }
+  },
 };

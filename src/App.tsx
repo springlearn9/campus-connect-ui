@@ -7,6 +7,7 @@ import Events from './pages/Events';
 import Notices from './pages/Notices';
 import LostFound from './pages/LostFound';
 import Users from './pages/Users';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
             <Route path="lost-found" element={<LostFound />} />
             <Route path="users" element={<Users />} />
             <Route path="analytics" element={<Dashboard />} />
-            <Route path="settings" element={<Dashboard />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -12,8 +12,10 @@ const DashboardLayout = () => {
       <Sidebar />
       <Flex direction="column" flex={1} overflow="hidden">
         <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <Box flex={1} overflow="auto" p={6} bg="gray.50">
-          <Outlet />
+        <Box flex={1} overflow="auto" bg="gray.50">
+          <Box p={6} minH="full">
+            <Outlet />
+          </Box>
         </Box>
       </Flex>
     </Flex>

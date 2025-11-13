@@ -70,3 +70,115 @@ export const stats: Stats = {
   totalEvents: 24,
   averageAttendance: 88,
 };
+
+// Mock Notices
+export const mockNotices = [
+  {
+    id: 1,
+    title: 'Final Exam Schedule Released',
+    description: 'The final examination schedule for Fall 2024 has been published. Please check your student portal.',
+    priority: 'HIGH',
+    category: 'ACADEMIC',
+    validUntil: '2024-12-31',
+    status: 'ACTIVE',
+    createdAt: '2024-11-01',
+    postedBy: { name: 'Academic Office' }
+  },
+  {
+    id: 2,
+    title: 'Library Hours Extended',
+    description: 'Library will remain open 24/7 during exam period starting December 10th.',
+    priority: 'NORMAL',
+    category: 'GENERAL',
+    validUntil: '2024-12-20',
+    status: 'ACTIVE',
+    createdAt: '2024-11-05',
+    postedBy: { name: 'Library Administration' }
+  },
+  {
+    id: 3,
+    title: 'Student Council Elections',
+    description: 'Nominations open for Student Council positions. Deadline: November 30th.',
+    priority: 'NORMAL',
+    category: 'ADMINISTRATIVE',
+    validUntil: '2024-11-30',
+    status: 'ACTIVE',
+    createdAt: '2024-11-10',
+    postedBy: { name: 'Student Affairs' }
+  }
+];
+
+// Mock Events  
+export const mockEvents = [
+  {
+    id: 1,
+    title: 'Tech Hackathon 2024',
+    description: 'Annual 48-hour coding competition with exciting prizes',
+    eventDate: '2024-12-15T09:00',
+    location: 'Main Auditorium',
+    status: 'ACTIVE',
+    createdAt: '2024-10-15',
+    postedBy: { name: 'Computer Science Dept' }
+  },
+  {
+    id: 2,
+    title: 'Annual Sports Meet',
+    description: 'Inter-department sports competition',
+    eventDate: '2024-12-20T08:00',
+    location: 'Sports Complex',
+    status: 'ACTIVE',
+    createdAt: '2024-10-20',
+    postedBy: { name: 'Sports Committee' }
+  },
+  {
+    id: 3,
+    title: 'Cultural Festival',
+    description: 'Celebrate diversity with music, dance, and food',
+    eventDate: '2024-12-25T17:00',
+    location: 'Campus Grounds',
+    status: 'ACTIVE',
+    createdAt: '2024-10-25',
+    postedBy: { name: 'Cultural Committee' }
+  }
+];
+
+// Mock Lost & Found Items
+export const mockLostItems = [
+  {
+    id: 1,
+    itemName: 'Blue Backpack',
+    description: 'Navy blue backpack with laptop compartment',
+    location: 'Library 2nd Floor',
+    status: 'PENDING',
+    createdAt: '2024-11-08',
+    user: { name: 'John Doe', email: 'john@campus.edu' }
+  },
+  {
+    id: 2,
+    itemName: 'iPhone 13',
+    description: 'Black iPhone 13 with cracked screen',
+    location: 'Cafeteria',
+    status: 'FOUND',
+    createdAt: '2024-11-10',
+    user: { name: 'Jane Smith', email: 'jane@campus.edu' }
+  }
+];
+
+export const mockFoundItems = [
+  {
+    id: 1,
+    itemName: 'Car Keys',
+    description: 'Toyota keys with red keychain',
+    location: 'Parking Lot B',
+    foundDate: '2024-11-12',
+    reportedBy: { name: 'Security', email: 'security@campus.edu' }
+  },
+  {
+    id: 2,
+    itemName: 'Textbook',
+    description: 'Advanced Mathematics textbook',
+    location: 'Math Building Room 201',
+    foundDate: '2024-11-11',
+    reportedBy: { name: 'Prof. Wilson', email: 'wilson@campus.edu' }
+  }
+];

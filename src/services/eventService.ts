@@ -1,4 +1,5 @@
 import api from './api';
+import { mockService } from './mockService';
 
 export interface Event {
   id?: number;
@@ -14,12 +15,27 @@ export interface Event {
 }
 
 export const eventService = {
-  getAllEvents: () => api.get<Event[]>('/events'),
+  getAllEvents: async () => {
+    try {
+      return await api.get<Event[]>('/events');
+    } catch (error) {
+      // Fallback to mock data
+      mockService.init();
+      return { data: mockService.getEvents() };
+    }
+  },
   
   getEventById: (id: number) => api.get<Event>(`/events/${id}`),
   
-  createEvent: (event: Event, userId: number) => 
-    api.post<Event>('/events', event, { params: { userId } }),
+  createEvent: async (event: Event, userId: number) => {
+    try {
+      return await api.post<Event>('/events', event, { params: { userId } });
+    } catch (error) {
+      // Fallback to mock data
+      const newEvent = mockService.addEvent(event);
+      return { data: newEvent };
+    }
+  },
   
   updateEvent: (id: number, event: Event, userId: number) =>
     api.put<Event>(`/events/${id}`, event, { params: { userId } }),

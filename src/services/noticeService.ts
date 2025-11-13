@@ -1,4 +1,5 @@
 import api from './api';
+import { mockService } from './mockService';
 
 export interface Notice {
   id?: number;
@@ -15,12 +16,27 @@ export interface Notice {
 }
 
 export const noticeService = {
-  getAllNotices: () => api.get<Notice[]>('/notices'),
+  getAllNotices: async () => {
+    try {
+      return await api.get<Notice[]>('/notices');
+    } catch (error) {
+      // Fallback to mock data
+      mockService.init();
+      return { data: mockService.getNotices() };
+    }
+  },
   
   getNoticeById: (id: number) => api.get<Notice>(`/notices/${id}`),
   
-  createNotice: (notice: Notice, userId: number) =>
-    api.post<Notice>('/notices', notice, { params: { userId } }),
+  createNotice: async (notice: Notice, userId: number) => {
+    try {
+      return await api.post<Notice>('/notices', notice, { params: { userId } });
+    } catch (error) {
+      // Fallback to mock data
+      const newNotice = mockService.addNotice(notice);
+      return { data: newNotice };
+    }
+  },
   
   updateNotice: (id: number, notice: Notice, userId: number) =>
     api.put<Notice>(`/notices/${id}`, notice, { params: { userId } }),

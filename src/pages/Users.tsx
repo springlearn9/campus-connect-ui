@@ -9,6 +9,18 @@ import {
   Grid,
   Text,
   Flex,
+  Stack,
+} from '@chakra-ui/react';
+import {
+  DialogActionTrigger,
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
 } from '@chakra-ui/react';
 import { Table } from '@chakra-ui/react';
 import { FiSearch, FiPlus, FiUsers } from 'react-icons/fi';
@@ -19,6 +31,13 @@ const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'STUDENT'
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -32,6 +51,28 @@ const Users = () => {
       console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setNewUser({
+      name: '',
+      email: '',
+      password: '',
+      role: 'STUDENT'
+    });
+  };
+
+  const handleAddUser = async () => {
+    try {
+      await userService.registerUser(newUser);
+      await fetchUsers(); // Refresh the list
+      resetForm();
+      setShowAddModal(false);
+      alert('User added successfully!');
+    } catch (error) {
+      console.error('Error adding user:', error);
+      alert('Error adding user. Check console for details.');
     }
   };
 
@@ -137,10 +178,64 @@ const Users = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </Group>
-          <Button colorPalette="brand">
-            <FiPlus />
-            Add User
-          </Button>
+          <DialogRoot open={showAddModal} onOpenChange={(e) => setShowAddModal(e.open)}>
+            <DialogTrigger asChild>
+              <Button colorPalette="brand">
+                <FiPlus />
+                Add User
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+              </DialogHeader>
+              <DialogBody>
+                <Stack gap={4}>
+                  <Input
+                    placeholder="Full Name"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                  />
+                  <Input
+                    type="email"
+                    placeholder="Email Address"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  />
+                  <select
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                    style={{
+                      padding: '8px',
+                      borderRadius: '6px',
+                      border: '1px solid #E2E8F0'
+                    }}
+                  >
+                    <option value="STUDENT">Student</option>
+                    <option value="FACULTY">Faculty</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </Stack>
+              </DialogBody>
+              <DialogFooter>
+                <DialogActionTrigger asChild>
+                  <Button variant="outline" onClick={() => { resetForm(); }}>
+                    Cancel
+                  </Button>
+                </DialogActionTrigger>
+                <Button colorPalette="brand" onClick={handleAddUser}>
+                  Add User
+                </Button>
+              </DialogFooter>
+              <DialogCloseTrigger />
+            </DialogContent>
+          </DialogRoot>
         </HStack>
 
         {loading ? (
