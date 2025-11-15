@@ -1,5 +1,6 @@
 import api from './api';
 import { mockService } from './mockService';
+import { apiCache } from '../utils/apiCache';
 
 export interface Event {
   id?: number;
@@ -16,23 +17,31 @@ export interface Event {
 
 export const eventService = {
   getAllEvents: async () => {
-    try {
-      return await api.get<Event[]>('/events');
-    } catch (error) {
-      // Fallback to mock data
-      mockService.init();
-      return { data: mockService.getEvents() };
-    }
+    return apiCache.get('events', async () => {
+      try {
+        const response = await api.get<Event[]>('/events');
+        return response;
+      } catch (error) {
+        // Fallback to mock data
+        mockService.init();
+        return { data: mockService.getEvents() };
+      }
+    });
   },
   
   getEventById: (id: number) => api.get<Event>(`/events/${id}`),
   
-  createEvent: async (event: Event, userId: number) => {
+  addEvent: async (event: Event, userId: number) => {
     try {
-      return await api.post<Event>('/events', event, { params: { userId } });
+      const result = await api.post<Event>('/events', event, { params: { userId } });
+      // Clear cache to ensure fresh data on next fetch
+      apiCache.clear('events');
+      return result;
     } catch (error) {
       // Fallback to mock data
       const newEvent = mockService.addEvent(event);
+      // Clear cache to ensure fresh data on next fetch
+      apiCache.clear('events');
       return { data: newEvent };
     }
   },

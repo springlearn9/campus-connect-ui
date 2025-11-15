@@ -68,7 +68,7 @@ const Events = () => {
   const handleAddEvent = async () => {
     try {
       // Mock user ID for demo - in real app this would come from auth
-      await eventService.createEvent(newEvent, 1);
+      await eventService.addEvent(newEvent, 1);
       await fetchEvents(); // Refresh the list
       resetForm();
       setShowAddModal(false);

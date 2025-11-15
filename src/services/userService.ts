@@ -1,5 +1,6 @@
 import api from './api';
 import { mockService } from './mockService';
+import { apiCache } from '../utils/apiCache';
 
 export interface User {
   id?: number;
@@ -11,40 +12,51 @@ export interface User {
 
 export const userService = {
   getAllUsers: async () => {
-    try {
-      return await api.get<User[]>('/users');
-    } catch (error) {
-      // Fallback to mock data
-      mockService.init();
-      return { data: mockService.getUsers() };
-    }
+    return apiCache.get('users', async () => {
+      try {
+        const response = await api.get<User[]>('/users');
+        return response;
+      } catch (error) {
+        // Fallback to mock data
+        mockService.init();
+        return { data: mockService.getUsers() };
+      }
+    });
   },
   
   registerUser: async (user: User) => {
     try {
-      return await api.post<User>('/users/register', user);
+      const result = await api.post<User>('/users/register', user);
+      // Clear cache to ensure fresh data on next fetch
+      apiCache.clear('users');
+      return result;
     } catch (error) {
       // Fallback to mock data
       const newUser = mockService.addUser(user);
+      // Clear cache to ensure fresh data on next fetch
+      apiCache.clear('users');
       return { data: newUser };
     }
   },
   
   // Get currently authenticated user (backend should expose /users/me)
   getCurrentUser: async () => {
-    try {
-      return await api.get<User>('/users/me');
-    } catch (error) {
-      // Fallback to mock data
-      const mockUser = {
-        id: 1,
-        name: 'John Doe',
-        email: 'john.doe@campus.edu',
-        role: 'STUDENT',
-        department: 'Computer Science',
-        photoUrl: 'https://via.placeholder.com/40'
-      };
-      return { data: mockUser };
-    }
+    return apiCache.get('currentUser', async () => {
+      try {
+        const response = await api.get<User>('/users/me');
+        return response;
+      } catch (error) {
+        // Fallback to mock data
+        const mockUser = {
+          id: 1,
+          name: 'John Doe',
+          email: 'john.doe@campus.edu',
+          role: 'STUDENT',
+          department: 'Computer Science',
+          photoUrl: 'https://via.placeholder.com/40'
+        };
+        return { data: mockUser };
+      }
+    });
   },
 };

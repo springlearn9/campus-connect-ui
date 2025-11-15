@@ -1,5 +1,6 @@
 import api from './api';
 import { mockService } from './mockService';
+import { apiCache } from '../utils/apiCache';
 
 export interface Notice {
   id?: number;
@@ -17,23 +18,31 @@ export interface Notice {
 
 export const noticeService = {
   getAllNotices: async () => {
-    try {
-      return await api.get<Notice[]>('/notices');
-    } catch (error) {
-      // Fallback to mock data
-      mockService.init();
-      return { data: mockService.getNotices() };
-    }
+    return apiCache.get('notices', async () => {
+      try {
+        const response = await api.get<Notice[]>('/notices');
+        return response;
+      } catch (error) {
+        // Fallback to mock data
+        mockService.init();
+        return { data: mockService.getNotices() };
+      }
+    });
   },
   
   getNoticeById: (id: number) => api.get<Notice>(`/notices/${id}`),
   
   createNotice: async (notice: Notice, userId: number) => {
     try {
-      return await api.post<Notice>('/notices', notice, { params: { userId } });
+      const result = await api.post<Notice>('/notices', notice, { params: { userId } });
+      // Clear cache to ensure fresh data on next fetch
+      apiCache.clear('notices');
+      return result;
     } catch (error) {
       // Fallback to mock data
       const newNotice = mockService.addNotice(notice);
+      // Clear cache to ensure fresh data on next fetch
+      apiCache.clear('notices');
       return { data: newNotice };
     }
   },
